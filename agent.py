@@ -17,8 +17,40 @@ from support import (MODEL, SYSTEM_PROMPT, call_local, execute_tool, mcp_client,
 MAX_TOOL_CALLS = 8  # Larkspur's own build capped the loop here; then a human takes over.
 
 TONE_ADDENDUM = ""                       # ✏️ Build 4, step 4.1, intelligence lane
-EXTRA_TOOLS: List[Dict[str, Any]] = []   # ✏️ Build 2, step 2.1: schemas for the tools you add
-LOCAL_TOOLS: Dict[str, Any] = {}         # ✏️ Build 2, step 2.1: the functions behind them
+EXTRA_TOOLS: List[Dict[str, Any]] = [    # ✏️ Build 2, step 2.1: schemas for the tools you add
+    {
+        "name": "cause_in_plain_words",
+        "description": "Explain a flight disruption cause code to the customer in plain English. Takes an internal cause code (WX, ATC, MX, CREW, SEC) and returns the customer-friendly explanation. Helps you explain to the customer why their flight was affected.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "cause_code": {
+                    "type": "string",
+                    "enum": ["WX", "ATC", "MX", "CREW", "SEC"],
+                    "description": "The internal cause code: WX (weather), ATC (air traffic control), MX (maintenance), CREW (crew availability), SEC (security)"
+                }
+            },
+            "required": ["cause_code"]
+        }
+    }
+]
+LOCAL_TOOLS: Dict[str, Any] = {          # ✏️ Build 2, step 2.1: the functions behind them
+    "cause_in_plain_words": lambda cause_code: _cause_in_plain_words(cause_code)
+}
+
+def _cause_in_plain_words(cause_code: str) -> str:
+    """Translate internal cause code to customer-friendly explanation."""
+    import json
+    import os
+    policy_file = os.path.join(os.path.dirname(__file__), "data/americas/disruption_policy.json")
+    with open(policy_file) as f:
+        policy = json.load(f)
+    labels = policy.get("cause_labels_customer", {})
+    if cause_code in labels:
+        return labels[cause_code].get("en", f"Disruption due to {cause_code}")
+    return f"Unknown cause code: {cause_code}"
+
+
 
 
 def text_of(response) -> str:
