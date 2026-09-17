@@ -16,7 +16,15 @@ from support import (MODEL, SYSTEM_PROMPT, call_local, execute_tool, mcp_client,
 
 MAX_TOOL_CALLS = 8  # Larkspur's own build capped the loop here; then a human takes over.
 
-TONE_ADDENDUM = ""                       # ✏️ Build 4, step 4.1, intelligence lane
+TONE_ADDENDUM = """
+
+When a customer expresses anger, frustration, or makes threats:
+- Acknowledge their frustration once without minimizing it
+- Do not proceed to normal entitlements discussion as though nothing happened
+- If escalation conditions are met (abuse, legal threats, hostile tone), escalate immediately
+- Never use emojis or overly cheerful language in response to hostility
+- Avoid language that reads as defensive or dismissive
+"""                       # ✏️ Build 4, step 4.1, intelligence lane
 EXTRA_TOOLS: List[Dict[str, Any]] = [    # ✏️ Build 2, step 2.1: schemas for the tools you add
     {
         "name": "cause_in_plain_words",
@@ -158,7 +166,12 @@ def build_tools() -> List[Dict[str, Any]]:                 # ✏️ Build 1, ste
         },
         {
             "name": "search_alternatives",
-            "description": "search",
+            "description": (
+                "Search available alternative flights for a disrupted passenger. Returns "
+                "a ranked list of rebooking options on Larkspur and partner carriers, "
+                "with seat maps, timing, and hold information. Use this to show the "
+                "customer their options before confirming a rebooking."
+            ),
             "input_schema": {
                 "type": "object",
                 "properties": {"pnr": {"type": "string"}},
