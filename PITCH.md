@@ -6,9 +6,9 @@ Built: A custom tool that translates internal disruption cause codes (WX, ATC, M
 Does:When a customer asks why their flight was disrupted, Claude now calls cause_in_plain_words to explain the reason in words the customer recognizes instead of jargon. The agent went from 9 tools to 12.
 Number: Schema tokens: 822 with 10 tools (Build 2.1) → 1,261 with 12 tools (Build 2.2), +439 tokens per turn. Input tokens per resolved contact: 26,202 (Build 2.1 baseline, 5 shapes, 1 run each).
 Guardrail: Tool descriptions drive routing. Our first probe ("When can I fly?") didn't trigger the tool because it didn't ask for explanation. Changing it to "Why was my flight cancelled?" made Claude pick the right tool—same agent, same tools, just better question.
-Next:Build 3. Create eval cases that grade the ager it completes. The gate checks correctness
+Next: Value conversation. Client readout on cost lane savings. Pitch caching and measure ROI on 13,700 chats/week ops volume.
 Still broken:The abusive ticket still gets a calm, normal resolution. No gate catches tone violations yet. That's Build 4's job.
-Lever: intelligence
+Lever: cost
 
 ## Priya asked
 
